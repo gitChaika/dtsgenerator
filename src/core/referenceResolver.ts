@@ -9,6 +9,7 @@ const debug = Debug('dtsgen');
 export default class ReferenceResolver {
     private readonly schemaCache = new Map<string, Schema>();
     private readonly referenceCache = new Map<string, Schema | undefined>();
+    private readonly enums = new Map<string, string[]>();
 
     public dereference(refId: string): Schema {
         const result = this.referenceCache.get(refId);
@@ -20,6 +21,10 @@ export default class ReferenceResolver {
 
     public getAllRegisteredSchema(): IterableIterator<Schema> {
         return this.schemaCache.values();
+    }
+
+    public getAllEnums(): Map<string, string[]> {
+        return this.enums;
     }
 
     public async resolve(): Promise<void> {
@@ -76,6 +81,7 @@ export default class ReferenceResolver {
         // debug('  resolve reference: resolved schema:');
         // debug(Array.from(this.referenceCache.keys()).join('\n'));
     }
+
     private searchParentSchema(id: SchemaId): Schema | undefined {
         const fileId = id.getFileId();
         const rootSchema = this.schemaCache.get(fileId);
@@ -117,6 +123,7 @@ export default class ReferenceResolver {
     private addSchema(schema: Schema): void {
         const id = schema.id;
         const key = id.getAbsoluteId();
+
         if (!this.schemaCache.has(key)) {
             debug(` add schema: id=${key}`);
             this.schemaCache.set(key, schema);
@@ -126,6 +133,19 @@ export default class ReferenceResolver {
                     this.schemaCache.set(fileId, schema);
                 }
             }
+
+            const { properties } = schema.content as any;
+
+            if (properties) {
+                Object.keys(properties)
+                    .forEach(propertyName => {
+                        const { enum: enumValues } = properties[propertyName];
+
+                        if (enumValues) {
+                            this.addEnum(id, propertyName, enumValues);
+                        }
+                    });
+            }
         }
     }
     private addReference(refId: SchemaId): void {
@@ -133,6 +153,13 @@ export default class ReferenceResolver {
             debug(` add reference: id=${refId.getAbsoluteId()}`);
             this.referenceCache.set(refId.getAbsoluteId(), undefined);
         }
+    }
+
+    private addEnum(id: SchemaId, propertyName: string, enumValues: string[]) {
+        const lastSlashIndex = id.inputId.lastIndexOf('/');
+        const typeName = id.inputId.substr(lastSlashIndex + 1);
+        const enumName = typeName + propertyName[0].toUpperCase() + propertyName.substr(1);
+        this.enums.set(enumName, enumValues);
     }
 
     public clear(): void {

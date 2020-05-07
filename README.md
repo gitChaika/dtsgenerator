@@ -22,7 +22,7 @@ TypeScript d.ts file generator from JSON Schema file or OpenAPI(Swagger) spec fi
 
 ## Install
 
-    npm install -g dtsgenerator
+    npm install -g dtsgeneratorws
 
 - [Releases](https://github.com/horiuchi/dtsgenerator/releases)
 

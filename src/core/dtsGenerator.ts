@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { isEqual } from 'lodash';
 import { tilde } from '../jsonPointer';
 import { getSubSchema, JsonSchema, NormalizedSchema, Schema } from './jsonSchema';
 import ReferenceResolver from './referenceResolver';
@@ -20,6 +21,7 @@ export default class DtsGenerator {
 
         const map = this.convertor.buildSchemaMergedMap(this.resolver.getAllRegisteredSchema(), typeMarker);
         this.convertor.start();
+        this.generateEnums();
         this.walk(map);
         const result = this.convertor.end();
 
@@ -104,6 +106,7 @@ export default class DtsGenerator {
     }
     private generateDeclareType(schema: NormalizedSchema): void {
         const content = schema.content;
+
         if (content.$ref || content.oneOf || content.anyOf || content.enum || 'const' in content || content.type !== 'object') {
             this.convertor.outputExportType(schema.id);
             this.generateTypeProperty(schema, true);
@@ -112,6 +115,23 @@ export default class DtsGenerator {
             this.generateProperties(schema);
             this.convertor.endInterfaceNest();
         }
+    }
+
+    private generateEnums(): void {
+        const enums = this.resolver.getAllEnums();
+
+        enums.forEach((values, name) => {
+            this.convertor.outputRawValue(`export const enum ${name} {\n`);
+            values.forEach(value => {
+                const enumKey = value[0].toUpperCase()
+                    + value.replace(/\-+([a-zA-Z])/g, match => match[match.length - 1].toUpperCase())
+                        .substr(1);
+                this.convertor.outputRawValue(' '.repeat(4));
+                this.convertor.outputRawValue(`${enumKey} = '${value}',`);
+                this.convertor.outputRawValue('\n');
+            });
+            this.convertor.outputRawValue('}\n\n');
+        });
     }
 
     private generateAnyTypeModel(schema: NormalizedSchema): void {
@@ -162,13 +182,15 @@ export default class DtsGenerator {
             return;
         }
         if (content.enum) {
-            this.convertor.outputArrayedType(schema, content.enum, (value) => {
-                if (content.type === 'integer' || content.type === 'number') {
-                    this.convertor.outputRawValue('' + value);
-                } else {
-                    this.convertor.outputRawValue(`"${value}"`);
+            const enums = this.resolver.getAllEnums();
+            let enumName = '';
+
+            enums.forEach((value, key) => {
+                if (isEqual(value, content.enum)) {
+                    enumName = key;
                 }
-            }, terminate);
+            });
+            this.convertor.outputRawValue(`${enumName};\n    `);
         } else if ('const' in content) {
             const value = content.const;
             if (content.type === 'integer' || content.type === 'number') {

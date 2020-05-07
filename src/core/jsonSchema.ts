@@ -343,11 +343,17 @@ export function searchAllSubSchema(schema: Schema, onFoundSchema: (subSchema: Sc
             setSubIdToPathsV2(openApi.paths, ['paths']);
         } else {
             if (openApi.components) {
-                const components = openApi.components;
-                setSubIdToObject(components.schemas, ['components', 'schemas']);
-                setSubIdToResponsesV3(components.responses, ['components', 'responses']);
-                setSubIdToParameterObject(components.parameters, ['components', 'parameters']);
-                setSubIdToRequestBodies(components.requestBodies, ['components', 'requestBodies']);
+                const {
+                    schemas,
+                    responses,
+                    parameters,
+                    requestBodies,
+                } = openApi.components;
+
+                setSubIdToObject(schemas, ['components', 'schemas']);
+                setSubIdToResponsesV3(responses, ['components', 'responses']);
+                setSubIdToParameterObject(parameters, ['components', 'parameters']);
+                setSubIdToRequestBodies(requestBodies, ['components', 'requestBodies']);
             }
             if (openApi.paths) {
                 setSubIdToPathsV3(openApi.paths, ['paths']);
