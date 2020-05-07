@@ -139,10 +139,10 @@ export default class ReferenceResolver {
             if (properties) {
                 Object.keys(properties)
                     .forEach(propertyName => {
-                        const { enum: enumValues } = properties[propertyName];
+                        const { enum: enumValues, enumName } = properties[propertyName];
 
                         if (enumValues) {
-                            this.addEnum(id, propertyName, enumValues);
+                            this.addEnum(id, enumName || propertyName, enumValues);
                         }
                     });
             }
