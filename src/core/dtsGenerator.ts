@@ -124,7 +124,7 @@ export default class DtsGenerator {
             this.convertor.outputRawValue(`export const enum ${name} {\n`);
             values.forEach(value => {
                 const enumKey = value[0].toUpperCase()
-                    + value.replace(/\-+([a-zA-Z])/g, match => match[match.length - 1].toUpperCase())
+                    + value.replace(/[\- ]+([a-zA-Z])/g, match => match[match.length - 1].toUpperCase())
                         .substr(1);
                 this.convertor.outputRawValue(' '.repeat(4));
                 this.convertor.outputRawValue(`${enumKey} = '${value}',`);
