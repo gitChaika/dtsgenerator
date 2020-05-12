@@ -1,6 +1,6 @@
 {
   "name": "dtsgeneratorws",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "TypeScript d.ts file generator for JSON Schema file",
   "bin": {
     "dtsgen": "./bin/dtsgen"

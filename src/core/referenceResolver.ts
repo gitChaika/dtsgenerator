@@ -142,7 +142,15 @@ export default class ReferenceResolver {
                         const { enum: enumValues, enumName } = properties[propertyName];
 
                         if (enumValues) {
-                            this.addEnum(id, enumName || propertyName, enumValues);
+                            let formattedEnumName = enumName;
+
+                            if (!formattedEnumName) {
+                                const lastSlashIndex = id.inputId.lastIndexOf('/');
+                                const typeName = id.inputId.substr(lastSlashIndex + 1);
+                                formattedEnumName = typeName + propertyName[0].toUpperCase() + propertyName.substr(1);
+                            }
+
+                            this.enums.set(enumName, enumValues);
                         }
                     });
             }
@@ -153,13 +161,6 @@ export default class ReferenceResolver {
             debug(` add reference: id=${refId.getAbsoluteId()}`);
             this.referenceCache.set(refId.getAbsoluteId(), undefined);
         }
-    }
-
-    private addEnum(id: SchemaId, propertyName: string, enumValues: string[]) {
-        const lastSlashIndex = id.inputId.lastIndexOf('/');
-        const typeName = id.inputId.substr(lastSlashIndex + 1);
-        const enumName = typeName + propertyName[0].toUpperCase() + propertyName.substr(1);
-        this.enums.set(enumName, enumValues);
     }
 
     public clear(): void {
