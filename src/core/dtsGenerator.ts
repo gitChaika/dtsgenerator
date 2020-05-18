@@ -183,13 +183,22 @@ export default class DtsGenerator {
         }
         if (content.enum) {
             const enums = this.resolver.getAllEnums();
+            const contentEnumName = (content as any).enumName;
             let enumName = '';
 
-            enums.forEach((value, key) => {
-                if (isEqual(value, content.enum)) {
-                    enumName = key;
-                }
-            });
+            if (enums.has(contentEnumName)) {
+                enumName = contentEnumName;
+            } else {
+                enums.forEach((value, key) => {
+                    if (enumName) {
+                        return ;
+                    }
+
+                    if (isEqual(value, content.enum)) {
+                        enumName = key;
+                    }
+                });
+            }
             this.convertor.outputRawValue(`${enumName};\n    `);
         } else if ('const' in content) {
             const value = content.const;
