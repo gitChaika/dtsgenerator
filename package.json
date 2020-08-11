@@ -1,5 +1,5 @@
 {
-  "name": "dtsgeneratorws",
+  "name": "@chaika/dtsgenerator",
   "version": "2.5.4",
   "description": "TypeScript d.ts file generator for JSON Schema file",
   "bin": {
@@ -31,13 +31,13 @@
   ],
   "author": "horiuchi",
   "license": "MIT",
-  "homepage": "https://github.com/tsapko3628/dtsgenerator",
+  "homepage": "https://github.com/gitChaika/dtsgenerator",
   "repository": {
     "type": "git",
-    "url": "git@github.com:tsapko3628/dtsgenerator.git"
+    "url": "git@github.com:gitChaika/dtsgenerator.git"
   },
   "bugs": {
-    "url": "https://github.com/tsapko3628/dtsgenerator/issues"
+    "url": "https://github.com/gitChaika/dtsgenerator/issues"
   },
   "engines": {
     "node": ">= 8.0"
@@ -49,7 +49,7 @@
     "debug": "^4.1.1",
     "glob": "^7.1.6",
     "js-yaml": "^3.13.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mkdirp": "^1.0.4",
     "tslib": "^1.11.1"
   },
