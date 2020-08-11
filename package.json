@@ -1,5 +1,5 @@
 {
-  "name": "@chaika/dtsgenerator",
+  "name": "dtsgeneratoren",
   "version": "2.5.4",
   "description": "TypeScript d.ts file generator for JSON Schema file",
   "bin": {
