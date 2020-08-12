@@ -12,15 +12,6 @@ export default class SchemaConvertor {
         this.ns = namespaceName == null ? undefined : namespaceName.split('/').filter((s) => s.length > 0);
     }
 
-    private getLastTypeName(id: SchemaId): string {
-        const names = this.convertor(id);
-        if (names.length > 0) {
-            return names[names.length - 1];
-        } else {
-            return '';
-        }
-    }
-
     public buildSchemaMergedMap(schemas: IterableIterator<Schema>, typeMarker: symbol): any {
         const map: any = {};
         const paths: { path: string[]; type: Schema; }[] = [];
@@ -187,6 +178,7 @@ export default class SchemaConvertor {
         });
         this.outputTypeNameTrailer(schema, terminate, outputOptional);
     }
+
     private getTypename(id: SchemaId, baseSchema: Schema): string[] {
         const result = this.convertor(id);
         this.replaceNamespace(result);
@@ -206,16 +198,28 @@ export default class SchemaConvertor {
         }
         return result;
     }
+
     public outputPrimitiveTypeName(schema: NormalizedSchema, typeName: string, terminate = true, outputOptional = true): void {
         this.processor.outputType(typeName, true);
         this.outputTypeNameTrailer(schema, terminate, outputOptional);
     }
+
     public outputStringTypeName(schema: NormalizedSchema, typeName: string, terminate: boolean, outputOptional = true): void {
         if (typeName) {
             this.processor.output(typeName);
         }
         this.outputTypeNameTrailer(schema, terminate, outputOptional);
     }
+
+    private getLastTypeName(id: SchemaId): string {
+        const names = this.convertor(id);
+        if (names.length > 0) {
+            return names[names.length - 1];
+        } else {
+            return '';
+        }
+    }
+
     private outputTypeNameTrailer(schema: NormalizedSchema, terminate: boolean, outputOptional: boolean): void {
         if (terminate) {
             this.processor.output(';');
@@ -227,6 +231,7 @@ export default class SchemaConvertor {
             this.processor.outputLine();
         }
     }
+
     private outputOptionalInformation(schema: NormalizedSchema, terminate: boolean): void {
         const format = schema.content.format;
         const pattern = schema.content.pattern;

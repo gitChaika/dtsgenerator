@@ -13,7 +13,7 @@ export default class DtsGenerator {
 
     private currentSchema!: NormalizedSchema;
 
-    constructor(private resolver: ReferenceResolver, private convertor: SchemaConvertor) { }
+    constructor(private resolver: ReferenceResolver, private convertor: SchemaConvertor, private ignoredNamespaces: string[] = []) { }
 
     public async generate(): Promise<string> {
         debug('generate type definition files.');
@@ -38,7 +38,7 @@ export default class DtsGenerator {
                 this.walkSchema(schema);
                 delete value[typeMarker];
             }
-            if (typeof value === 'object' && Object.keys(value).length > 0) {
+            if (!this.ignoredNamespaces.includes(key) && typeof value === 'object' && Object.keys(value).length > 0) {
                 this.convertor.startNest(key);
                 this.walk(value);
                 this.convertor.endNest();
@@ -109,7 +109,7 @@ export default class DtsGenerator {
 
         if (content.$ref || content.oneOf || content.anyOf || content.enum || 'const' in content || content.type !== 'object') {
             this.convertor.outputExportType(schema.id);
-            this.generateTypeProperty(schema, true);
+            this.generateTypeProperty(schema, true, true);
         } else {
             this.convertor.startInterfaceNest(schema.id);
             this.generateProperties(schema);
@@ -123,9 +123,13 @@ export default class DtsGenerator {
         enums.forEach((values, name) => {
             this.convertor.outputRawValue(`export const enum ${name} {\n`);
             values.forEach(value => {
-                const enumKey = value[0].toUpperCase()
+                let enumKey = value[0].toUpperCase()
                     + value.replace(/[\- ]+([a-zA-Z])/g, match => match[match.length - 1].toUpperCase())
                         .substr(1);
+
+                if(/[^A-Za-zА-Яа-я]+/.test(enumKey)) {
+                    enumKey = `"${enumKey}"`;
+                }
                 this.convertor.outputRawValue(' '.repeat(4));
                 this.convertor.outputRawValue(`${enumKey} = '${value}',`);
                 this.convertor.outputRawValue('\n');
@@ -166,7 +170,7 @@ export default class DtsGenerator {
             }
         }
     }
-    private generateTypeProperty(schema: NormalizedSchema, terminate = true): void {
+    private generateTypeProperty(schema: NormalizedSchema, terminate = true, enumaAsString = false): void {
         const content = schema.content;
         if (content.$ref) {
             const ref = this.resolver.dereference(content.$ref);
@@ -181,7 +185,7 @@ export default class DtsGenerator {
             this.generateArrayedType(schema, content.oneOf, '/oneOf/', terminate);
             return;
         }
-        if (content.enum) {
+        if (!enumaAsString && content.enum) {
             const enums = this.resolver.getAllEnums();
             const contentEnumName = (content as any).enumName;
             let enumName = '';

@@ -11,6 +11,10 @@ TypeScript d.ts file generator from JSON Schema file or OpenAPI(Swagger) spec fi
 [![dtsgenerator Dev Token](https://badge.devtoken.rocks/dtsgenerator)](https://devtoken.rocks/package/dtsgenerator)
 [![MIT license](https://img.shields.io/npm/l/dtsgenerator.svg)](#)
 
+## Differences from origin  
+ - Added generate enum export
+ - Added ignored namespaces param
+
 ## Table of Contents
 
 - [Install](#install)
@@ -22,7 +26,7 @@ TypeScript d.ts file generator from JSON Schema file or OpenAPI(Swagger) spec fi
 
 ## Install
 
-    npm install -g dtsgeneratorws
+    npm install -g dtsgeneratoren
 
 - [Releases](https://github.com/horiuchi/dtsgenerator/releases)
 
@@ -56,7 +60,7 @@ For customize the output type name.
 
 ### Install for library
 
-    npm install -S dtsgenerator
+    npm install -S dtsgeneratoren
 
 ### Usage for library
 
