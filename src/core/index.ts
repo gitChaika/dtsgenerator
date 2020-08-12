@@ -30,6 +30,6 @@ export default async function dtsGenerator(options: Options): Promise<string> {
         await Promise.all(options.inputUrls.map((url) => resolver.registerRemoteSchema(url)));
     }
 
-    const generator = new DtsGenerator(resolver, convertor);
+    const generator = new DtsGenerator(resolver, convertor, options.ignoredNamespaces);
     return await generator.generate();
 }
